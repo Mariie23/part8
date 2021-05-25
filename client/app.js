@@ -75,23 +75,38 @@ $("main .content").append($content);
 });
 } else if ($element.parent().is(":nth-child(4)")) {
     var $input = $("<input>").addClass("description"), 
-    $inputLabel = $("<p>").text("Новая задача: "),
+    $textInput = $("<p>").text("Введите новую задачу: "),
     $tagInput = $("<input>").addClass("tags"),
     $tagLabel = $("<p>").text("Тэги: "),
     $button = $("<button>").text("+");
-    $button.on("click", function () {
-    var description = $input.val(),
-    // разделение в соответствии с запятыми
-    tags = $tagInput.val().split(","); 
-    toDoObjects.push({"description":description, "tags":tags}); 
-    // обновление toDos
-    toDos = toDoObjects.map(function (toDo) {
-        return toDo.description;
+    $("main .content").append($textInput).append($input).append($tagLabel).append($tagInput).append($button); 
+    function btnfunc() {
+        var description = $input.val(),
+            tags = $tagInput.val().split(","),
+            // создаем новый элемент списка задач
+            newToDo = {"description":description, "tags":tags};
+        $.post("todos", newToDo, function(result) {
+            console.log(result);
+            // нужно отправить новый объект на клиент
+            // после получения ответа сервера
+            toDoObjects.push(newToDo);
+            // обновляем toDos
+            toDos = toDoObjects.map(function (toDo) {
+                return toDo.description;
+            });
+            $input.val("");
+            $tagInput.val("");
+            $(".tabs a:first-child span").trigger("click");
+        });
+    }
+    $button.on("click", function() {
+        btnfunc();
     });
-    $input.val("");
-    $tagInput.val("");
-});
-$("main .content").append($inputLabel).append($input).append($tagLabel).append($tagInput).append($button); 
+    $('.tags').on('keydown',function(e){
+        if (e.which === 13) {
+            btnfunc();
+        }
+    });
 }
     return false;
 })
