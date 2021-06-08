@@ -12,7 +12,7 @@ var express = require("express"),
 		// содержимого из файла todos.OLD.json
 	];*/
 	// импортируем библиотеку mongoose
-app.use(express.static(__dirname + "/client"));
+app.use(express.static((__dirname + "/client")));
 // Это модель Mongoose для задач
 app.get("/todos.json", function (req, res) {
 	ToDo.find({}, function (err, toDos) {
