@@ -22,17 +22,37 @@ ToDosController.index = function (req, res) {
             } else if (result.length === 0) {
                 res.status(404).json({ "result_length": 0 });
             } else {
-                respondWithToDos({});
+                respondWithToDos({"owner": result[0]._id});
             }
         });
     } else {
-        res.status(404).json({ "username": username });
-    }
+        respondWithToDos({});    }
 };
 // Создать нового пользователя
 ToDosController.create = function (req, res) {
-    console.log("вызвано действие: создать");
-    res.send(200);
+    var username = req.params.username || null,
+        newToDo = new ToDo({
+            "description": req.body.description,
+            "tags": req.body.tags
+        });
+    User.find({ "username": username }, function (err, result) {
+        if (err) {
+            res.send(500);
+        } else {
+            if (result.length === 0) {
+                newToDo.owner = null;
+            } else {
+                newToDo.owner = result[0]._id;
+            }
+            newToDo.save(function (err, result) {
+                if (err !== null) {
+                    res.json(500, err);
+                } else {
+                    res.status(200).json(result);
+                }
+            });
+        }
+    });
 };
 // Обновить существующего пользователя
 ToDosController.update = function (req, res) {
