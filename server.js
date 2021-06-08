@@ -1,8 +1,8 @@
 var express = require("express"),
 	http = require("http"),
 	mongoose = require("mongoose"),
-	usersController = require("./controllers/users_controller"),
-    toDosController = require("./controllers/todos_controller"),
+	usersController = require("./controllers/users_controller.js"),
+    toDosController = require("./controllers/todos_controller.js"),
 	ToDo = require("./models/todo"),
 	app = express();
 	mongoose.connect('mongodb://localhost/amazeriffic'); 

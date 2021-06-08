@@ -61,7 +61,17 @@ ToDosController.update = function (req, res) {
 };
 // Удалить существующего пользователя
 ToDosController.destroy = function (req, res) {
-    console.log("destroy action called");
-    res.send(200);
+    var id = req.params.id;
+    ToDo.deleteOne({ "_id": id }, function (err, todo) {
+        if (err !== null) {
+            res.status(500).json(err);
+        } else {
+            if (todo.n === 1 && todo.ok === 1 && todo.deletedCount === 1) {
+                res.status(200).json(todo);
+            } else {
+                res.status(404).json({ "status": 404 });
+            }
+        }
+    });
 };
 module.exports = ToDosController;
