@@ -30,41 +30,34 @@ var organizeByTags = function (toDoObjects) {
     console.log(tagObjects);
 	return tagObjects;
 };
-var liaWithEditOnСlick = function (todo) {
-    var $todoListItem = $("<li>").text(todo.description),
-        $todoRemoveLink = $("<a>").attr("href", "todos/" + todo._id);
-    $todoRemoveLink.text("Редактировать");
-    $todoRemoveLink.on("click", function () {
-        var newDescription = prompt("Введите новое наименование для задачи",
-            todo.description);
-        if (newDescription !== null && newDescription.trim() !== "") {
-            $.ajax({
-                url: "todos/" + todo._id,
-                type: "PUT",
-                data: { "description": newDescription }
-            }).done(function (response) {
-                location.reload();
-                $(".tabs a:nth-child(2) span").trigger("click");
-            }).fail(function (err) {
-            });
-        }
-        return false;
-    });
-    $todoListItem.append($todoRemoveLink);
-    return $todoListItem;
-};
-var liaWithDeleteOnClick = function(todo) {
+
+var liaWithEditOrDeleteOnClick = function(todo) {
 	var $todoListItem = $("<li>").text(todo.description),
+        $todoEditLink = $("<a>").attr("href", "todos/" + todo._id),
 		$todoRemoveLink = $("<a>").attr("href", "./todos/" + todo._id);
+        $todoEditLink.text("Редактировать");
+        $todoEditLink.on("click", function() {
+            var newDescription = prompt("Введите новое наименование для задачи", todo.description);
+		if (newDescription !== null && newDescription.trim() !== "") {
+			$.ajax({
+				"url": "/todos/" + todo._id,
+				"type": "PUT",
+				"data": { "description": newDescription },
+			}).done(function (responde) {
+				$(".tabs a:nth-child(2) span").trigger("click");
+			}).fail(function (err) {
+				console.log("Произошла ошибка: " + err);
+			});
+		}
+		return false;
+	});
+	$todoListItem.append($todoEditLink);
+
 	$todoRemoveLink.text("Удалить");
-	console.log("todo._id: " + todo._id);
-	console.log("todo.description: " + todo.description);
 	$todoRemoveLink.on("click", function () {
 		$.ajax({
-			"url": "todos/" + todo._id,
-			"type": "DELETE",
-            dataType: 'jsonp',
-      		jsonp: 'jsonp'
+			url: "/todos/" + todo._id,
+			type: "DELETE",
 		}).done(function (responde) {
 			$(".tabs a:first-child span").trigger("click");
 		}).fail(function (err) {
@@ -94,18 +87,17 @@ var main = function (toDoObjects) {
 					i;
 				$content = $("<ul>");
 				for (i = toDoObjects.length-1; i>=0; i--) {
-					var $todoListItem = liaWithDeleteOnClick(toDoObjects[i]);
-					$content.append($todoListItem);
+                    var $todoListItem = liaWithEditOrDeleteOnClick(toDoObjects[i]);	
+                    $content.append($todoListItem);
 				}
-	   			// return $content;
-	   			callback(null,$content);
-   			}).fail(function (jqXHR, textStatus, error) {
-   				   // в этом случае мы отправляем ошибку вместе с null для $content
-				callback(error, null);
-			});		
+                callback(null, $content);	
+			
+			}).fail(function (jqXHR, textStatus, error) {
+                callback(error, null);
+			});
 		}
 	});
-	// добавляем вкладку Старые 
+	
 	tabs.push({ 
 		"name":"Старые", 
 		"content":function (callback) {
@@ -114,9 +106,8 @@ var main = function (toDoObjects) {
 					i;
 				$content = $("<ul>");
 				for (i = 0; i < toDoObjects.length; i++) {
-					var $todoListItem = liaWithEditOnClick(toDoObjects[i]);
-					$content.append($todoListItem);
-				}
+					var $todoListItem = liaWithEditOrDeleteOnClick(toDoObjects[i]);
+					$content.append($todoListItem);}
 				callback(null, $content);
 			}).fail(function(jqXHR, textStatus, error) {
 				callback(error, null);
