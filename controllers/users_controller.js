@@ -1,4 +1,5 @@
 var User = require("../models/user.js"),
+ToDo = require("../models/todo.js"),
     mongoose = require("mongoose");
 
 // проверка, не существует ли уже пользователь
@@ -22,29 +23,26 @@ var User = require("../models/user.js"),
 var UsersController = {};
 UsersController.index = function (req, res) {
     console.log("вызвано действие: индекс");
-    res.send(200);
+    User.find(function (err, users) {
+        if (err !== null) {
+          res.json(500, err);
+        } else {
+            res.status(200).json(users);
+        }
+    });
 };
 // Отобразить пользователя
 UsersController.show = function (req, res) {
-    ToDosController.show = function (req, res) {
-        // это ID, который мы отправляем через URL
-        var id = req.params.id;
-        // находим элемент списка задач с соответствующим ID 
-        ToDo.find({"_id":id}, function (err, todo) {
-            if (err !== null) {
-                // возвращаем внутреннюю серверную ошибку 
-                res.status(500).json(err);
-            } else {
-                if (todo.length > 0) {
-                    // возвращаем успех!
-                    res.status(200).json(todo[0]);
-                } else {
-                    // мы не нашли элемент списка задач с этим ID! 
-                    res.send(404);
-                }
-            }
-        });
-    };
+    console.log('Вызвано действие: отобразить пользователя');
+	User.find({'username': req.params.username}, function(err, result) {
+	if (err) {
+		console.log(err);
+	} else if (result.length !== 0) {
+		res.sendfile('./client/list.html');
+	} else {
+	  res.send(404);
+	}
+	});
 };
 // Создать нового пользователя
 UsersController.create = function (req, res) {
@@ -56,7 +54,7 @@ UsersController.create = function (req, res) {
 	        console.log(err);
 	        res.send(500, err);
 	    } else if (result.length !== 0) {
-	        res.send(200, "Пользователь уже существует");
+	        res.status(501).send("Пользователь уже существует");
 	        console.log(err);   
 	        console.log("Пользователь уже существует"); 
 	    } else {
@@ -78,14 +76,17 @@ UsersController.create = function (req, res) {
 // Обновить существующего пользователя
 UsersController.update = function (req, res) {
     console.log("Вызвано действие: обновить пользователя");
-	var id = req.params.username;
+	var username = req.params.username;
+	console.log("Старое имя пользователя: " + username);
 	var newUsername = {$set: {username: req.body.username}};
+    console.log("Новое имя пользователя: " + req.body.username);
 	User.updateOne({"username": username}, newUsername, function (err,user) {
 		if (err !== null) {
 			res.status(500).json(err);
 		} else {
 			if (user.n === 1 && user.nModified === 1 && user.ok === 1) {
-				res.status(200).json(todo).json({"status": 404});
+				console.log('Изменен');
+				res.status(200).json(user);
 			} else {
 				res.status(404);
 			}
@@ -95,17 +96,18 @@ UsersController.update = function (req, res) {
 // Удалить существующего пользователя
 UsersController.destroy = function (req, res) {
     console.log("Вызвано действие: удалить пользователя");
-	var username = req.params.username;
-	ToDo.deleteOne({"username": username}, function (err, user) {
-		if (err !== null) {
-			res.status(500).json(err);
-		} else {
-			if (user.n === 1 && user.ok === 1 && user.deletedCount === 1) {
-				res.status(200).json(todo);
-			} else {
-				res.status(404).json({"status": 404});
-			}
-		}
+    var id = req.params.id;
+    User.deleteOne({ "_id": id }, function (err, user) {
+        if (err !== null) {
+            res.status(500).json(err);
+        } else {
+            if (user.n === 1 && user.ok === 1 && user.deletedCount === 1) {
+                res.status(200).json(user);
+            } else {
+                res.status(404).json({ "status": 404 });
+            }
+        }
+    
 	});
 };
 module.exports = UsersController;

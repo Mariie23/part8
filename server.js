@@ -38,6 +38,11 @@ mongoose.connect('mongodb://localhost/amazeriffic', {
 }).catch(err => {
 	console.log(Error, err.message);
 });
+app.get("/todos.json", toDosController.index);
+app.get("/todos/:id", toDosController.show); 
+app.post("/todos", toDosController.create);
+app.put("/todos/:id", toDosController.update);
+app.delete("/todos/:id", toDosController.destroy);
 app.use('/', express.static((__dirname + "/Client")));
 app.use('/user/:username', express.static(__dirname + '/client'));
 
