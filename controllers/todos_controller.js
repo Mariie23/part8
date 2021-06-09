@@ -35,26 +35,50 @@ ToDosController.create = function (req, res) {
             "description": req.body.description,
             "tags": req.body.tags
         });
-    User.find({ "username": username }, function (err, result) {
-        if (err) {
-            res.send(500);
-        } else {
-            if (result.length === 0) {
-                newToDo.owner = null;
+        console.log("username: " + username);
+        User.find({"username": username}, function (err, result) {
+            if (err) {
+                res.send(500);
             } else {
-                newToDo.owner = result[0]._id;
-            }
-            newToDo.save(function (err, result) {
-                if (err !== null) {
-                    res.json(500, err);
+                if (result.length === 0) {
+                    newToDo.owner = null;
                 } else {
-                    res.status(200).json(result);
+                    newToDo.owner = result[0]._id;
                 }
-            });
-        }
-    });
+                newToDo.save(function (err, result) {
+                    console.log(result);
+                    if (err !== null) {
+                        // элемент не был сохранен!
+                        console.log(err);
+                        res.json(500, err);
+                    } else {
+                        res.status(200).json(result);
+                    }
+                });
+            }
+        });
+
 };
 // Обновить существующего пользователя
+ToDosController.show = function (req, res) {
+	// это ID, который мы отправляем через URL
+	var id = req.params.id;
+	// находим элемент списка задач с соответствующим ID 
+	ToDo.find({"_id":id}, function (err, todo) {
+		if (err !== null) {
+			// возвращаем внутреннюю серверную ошибку 
+			res.status(500).json(err);
+		} else {
+			if (todo.length > 0) {
+				// возвращаем успех!
+				res.status(200).json(todo[0]);
+			} else {
+				// мы не нашли элемент списка задач с этим ID! 
+				res.send(404);
+			}
+		}
+	});
+};
 ToDosController.update = function (req, res) {
     var id = req.params.id;
     var newDescription = { $set: { description: req.body.description } };

@@ -24,7 +24,7 @@ var organizeByTags = function (toDoObjects) {
 				toDosWithTag.push(toDo.description);
 			}
 		});
-		// мы связываем каждый тег с объектом, который  содержит название тега и массив
+		// мы связываем каждый тег с объектом, который // содержит название тега и массив
 		return { "name": tag, "toDos": toDosWithTag };
 	});
     console.log(tagObjects);
@@ -73,7 +73,11 @@ var liaWithEditOrDeleteOnClick = function(todo, callback) {
 }
 var main = function (toDoObjects) {
 	"use strict";
-	
+	var toDos = toDoObjects.map(function (toDo) {
+		// просто возвращаем описание
+		// этой задачи
+		return toDo.description;
+	});
 	
 	// создание пустого массива с вкладками 
 	var tabs = [];
@@ -100,7 +104,7 @@ var main = function (toDoObjects) {
 	});
 	
 	tabs.push({ 
-		"name": "Старые", 
+		"name":"Старые", 
 		"content":function (callback) {
 			$.getJSON("todos.json", function (toDoObjects) {
 				var $content,
@@ -119,7 +123,7 @@ var main = function (toDoObjects) {
 	});
 	// добавляем вкладку Теги 
 	tabs.push({ 
-		"name": "Теги", 
+		"name":"Теги", 
 		"content":function (callback) {
 			$.get("todos.json", function (toDoObjects) {	
 				// создание $content для Теги 
@@ -144,7 +148,7 @@ var main = function (toDoObjects) {
 	});
 	// Создаем вкладку Добавить 
 	tabs.push({ 
-		"name": "Добавить", 
+		"name":"Добавить", 
 		"content":function () {
 			$.get("todos.json", function (toDoObjects) {	
 				// создание $content для Добавить 
@@ -158,7 +162,7 @@ var main = function (toDoObjects) {
 					var description = $input.val(),
 						tags = $tagInput.val().split(","),
 						// создаем новый элемент списка задач
-						newToDo = {"description":description, "tags":tags};
+						newToDo = {"description":description, "tags":tags, "username":null};
 					$.post("todos", newToDo, function(result) {
 						$input.val("");
 						$tagInput.val("");
