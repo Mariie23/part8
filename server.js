@@ -12,9 +12,8 @@ var express = require("express"),
 		// содержимого из файла todos.OLD.json
 	];*/
 	// импортируем библиотеку mongoose
-app.use(express.static((__dirname + "/client")));
 // Это модель Mongoose для задач
-app.get("/todos.json", function (req, res) {
+/*app.get("/todos.json", function (req, res) {
 	ToDo.find({}, function (err, toDos) {
         if (err !== null) {
             // объект не был передан
@@ -22,34 +21,22 @@ app.get("/todos.json", function (req, res) {
             res.json({ "message": "объект не был передан!" });
         } else { res.json(toDos); }
     });
-});
+});*/
 // Этот маршрут замещает наш файл
 // todos.json в примере из части 5
 
 // командуем Express принять поступающие
 // объекты JSON
-app.use(express.urlencoded());
+app.use(express.urlencoded({ extended: true }));
 // подключаемся к хранилищу данных Amazeriffic в Mongo
-app.post("/todos", function (req, res) {
-	console.log(req.body);
-	var newToDo = new ToDo({"description":req.body.description,
-		"tags":req.body.tags});
-	newToDo.save(function (err, result) {
-		if (err !== null) {
-			console.log(err);
-			res.send("ERROR");
-		} else {
-			// клиент ожидает, что будут возвращены все задачи,
-			// поэтому для сохранения совместимости сделаем дополнительный запрос
-			ToDo.find({}, function (err, result) {
-				if (err !== null) {
-					// элемент не был сохранен
-					res.send("ERROR");
-				}
-				res.json(result);
-			});
-		}
-	});
+mongoose.connect('mongodb://localhost/amazeriffic', {
+		useNewUrlParser: true,
+		useCreateIndex: true,
+		useUnifiedTopology: true 
+}).then(res => {
+	console.log("DB Connected!")
+}).catch(err => {
+	console.log(Error, err.message);
 });
 app.use('/', express.static((__dirname + "/Client")));
 app.use('/user/:username', express.static(__dirname + '/client'));
