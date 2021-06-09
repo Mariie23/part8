@@ -15,7 +15,7 @@ a:hover {
 header, main, footer {
     min-width: 855px;
 }
-header .container, main .container, footer .container {
+header .container, aside .container, main .container, footer .container {
     max-width: 855px;
     margin: auto;
 }
@@ -119,4 +119,9 @@ footer {
 	color: white;
 	text-decoration: none;
 }
-
+aside {
+	background: white;
+	overflow: auto;
+	padding: 20px;
+	margin-bottom: 3px;
+}

@@ -16,6 +16,7 @@ ToDosController.index = function (req, res) {
         });
     };
     if (username !== null) {
+        console.log("Поиск пользователя: "+username);
         User.find({ "username": username }, function (err, result) {
             if (err !== null) {
                 res.json(500, err);
